@@ -1,0 +1,65 @@
+
+
+
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{a4paper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{The Lax-Wendroff Scheme}
+\author{Jo\~ao Bettencourt}
+\date{February 2023}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+
+The Lax-Wendroff scheme starts from the linear 1-d advection equation:
+\begin{equation}\label{eqn:1dlinadve} % requires amsmath; align* for no eq. number
+   \frac{\partial u}{\partial t} = -c  \frac{\partial u}{\partial x},
+\end{equation}
+
+and uses the Taylor series expansion of $u(x,t+\Delta t)=u(x_m,t^{n+1})=u_{m}^{n+1}$:
+\begin{equation}\label{eqn:taylor}
+   u_{m}^{n+1} = u_{m}^{n} + \Delta t \frac{\partial u}{\partial t} + \frac{\Delta t^2}{2} \frac{\partial^2 u}{\partial t^2}+O(\Delta t^3).
+\end{equation} 
+
+If we replace the time derivatives in (\ref{eqn:taylor}) by the spatial derivative from (\ref{eqn:1dlinadve}), 
+we get\footnote{Note that from (\ref{eqn:1dlinadve}) we have:
+\(\frac{\partial^2 u}{\partial t^2} = -c  \frac{\partial}{\partial t} \left(\frac{\partial u}{\partial x}\right)=
+-c  \frac{\partial }{\partial x} \left(\frac{\partial u}{\partial t}\right)=-c  \frac{\partial }{\partial x} \left(-c\frac{\partial u}{\partial x}\right)=
+c^2  \frac{\partial^2 u}{\partial x^2}\)}: 
+\begin{equation}\label{eqn:taylor2}
+   u_{m}^{n+1} = u_{m}^{n} + \Delta t (-c\frac{\partial u}{\partial x}) + \frac{\Delta t^2}{2} c^{2}\frac{\partial^2 u}{\partial x^2}+O(\Delta t^3).
+\end{equation} 
+
+Now we can approximate the spatial derivatives with centred differences to obtain the Lax-Wendroff scheme:
+\begin{equation}\label{eqn:lax}
+   u_{m}^{n+1} = u_{m}^{n} - c\frac{\Delta t}{2\Delta x}(u_{m+1}^{n}-u_{m-1}^{n}) + c^2\frac{\Delta t^2}{\Delta x^2}(u_{m+1}^{n}-2u_{m}^{n}+u_{m-1}^{n}),
+\end{equation} 
+
+where we recognize that the last term in (\ref{eqn:lax}) is a dissipative term added to (\ref{eqn:1dlinadve}) to control what would otherwise be an unstable Euler method. 
+To find out the order of the Lax-Wendroff scheme, we can return to (\ref{eqn:taylor2}) and rewrite it as:
+\begin{equation*}\label{eqn:taylor3}
+   \frac{u_{m}^{n+1} - u_{m}^{n}}{ \Delta t } =-c\frac{\partial u}{\partial x} + \frac{\Delta t}{2} c^{2}\frac{\partial^2 u}{\partial x^2}+O(\Delta t^2),
+\end{equation*} 
+where we then replace the spatial derivatives with their second-order approximations:
+\begin{multline*}\label{eqn:taylor4}
+   \frac{u_{m}^{n+1} - u_{m}^{n}}{ \Delta t } =-c \left[ \frac{u_{m+1}^{n}-u_{m-1}^{n}}{2\Delta x}   + O(\Delta x^2)\right] + \\
+  +\frac{\Delta t}{2} c^{2}\left[ \frac{u_{m+1}^{n}-2*u_{m}^{n} - u_{m-1}^{n}}{\Delta x^2}  + O(\Delta x^2)\right]+O(\Delta t^2),
+\end{multline*} 
+
+to find that the scheme is second order in space as in time.
+
+\end{document} 
